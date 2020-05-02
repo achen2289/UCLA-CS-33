@@ -1,0 +1,24 @@
+Alex Chen
+005299047
+CS 33
+Homework #2
+Magic 8 Ball
+
+--------------
+
+printf("%s", magic8ball[3][4]);
+
+- This statement will return the string, "Wrong".
+
+- char magic8ball[8][8][8] is a 3-d array of chars, meaning there are 8 arrays in one large array, and in each of those 8 arrays, there are 8 arrays each containing an array of 8 chars. Thus, magic8ball[3][4] refers to 8 chars at a specific byte number.
+
+- &magic8ball[3] = starting address + 8*8*3 bytes
+- &magic8ball[3][4] = &magic8ball[3] + 8*4 bytes
+- &magic8ball[3][4] = starting address + 224 bytes
+- &magic8ball[3][4] = starting address + 0xe0 bytes
+- &magic8ball[3][4] = 0x7fffffffe0e0
+- magic8ball[3][4] = 0x57 0x72 0x6f 0x6e 0x67 0x00 0x00 0x00
+
+- These are the bytes that are stored for an array of 8 chars. Thus, endian-ness has no effect and the bytes can be directly translated into their corresponding ASCII characters.
+
+- magic8ball[3][4] = Wrong

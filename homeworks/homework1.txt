@@ -1,0 +1,38 @@
+Alex Chen
+005299047
+CS 33
+Homework 1
+Book problems
+
+----------
+
+2.71)
+	A. The given code correctly right shifts the word by eight times the byte number and &’s the result with 0xFF, to arrive at the byte that needs to be extracted. However, if the extracted byte should be negative, anding with 0xFF will not allow sign extension to retain the original negative number.
+
+	B. 
+
+	/* Hopefully successful attempt at xbyte */
+	int xbyte(packed_t word, int bytenum)
+	{
+    	    return (word << ((3 - bytenum) << 3)) >> 24;
+	}
+
+2.82)
+Tmin = smallest value that two’s complement can hold.
+Tmax = largest value that two’s complement can hold.
+
+	A. This expression does not always yield 1 because when x is Tmin and y is anything else, x will be less than y. Then, on the other side, negative x will be -Tmin. Because -Tmin cannot be stored in the same number of bits, overflow will occur. Thus, -x overflows to Tmin, which is less than or equal to any other integer, including -y.
+
+	B. This expression always equals one. Left shifting by 4 is equivalent to multiplying by 2^4. Thus, ((x+y) << 4) + y-x = 16(x+y) + y-x = 17y + 15x. Thus, the right and left hand sides of the expression are equal. 
+
+	C. This statement always yields 1. Either side of the expression can be transformed to resemble the other side. ~(x+y) + (x+y) = -1, so ~(x+y) = -1 - (x+y) = -1 - (-1 - ~x -1 - ~y) = ~x + ~y + 1
+
+	D. This statement always yields 1. When a negative sign is applied to an unsigned integer ua, the result is equivalent to 2^32 - ua, due to overflow back to Umax. Thus, after simplification, the left hand side and right hand side of the expression are equal.
+
+	LHS: 	      ux - uy = ux + 2^32 - uy
+	RHS: -(unsigned)(y-x) = (2^32 - (uy-ux))
+			      = 2^32 - uy + ux
+
+	E. This statement always yields 1. Right shifting any integer x by 2, and then shifting the result left by 2 will only change the two least significant bits to 0. If those original bits were both 0, then x is unchanged. If not, then the new answer can only be smaller than the original value, and by 3 at max.
+
+
