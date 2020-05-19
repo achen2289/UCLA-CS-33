@@ -1,0 +1,46 @@
+Alex Chen
+CS 33
+005299047
+Homework 3
+
+------------
+
+5.19
+
+// prefix sum calculator using 5 way loop unrolling and reassociation
+void psum1(float a[], float p[], long n)
+{
+    long i;
+    float start = p[0] = a[0];
+    float temp;
+    float a0, a1, a2, a3, a4;
+    for (i = 1; i < n-4; i+=5)
+    {
+        // pull values from memory once to improve efficiency
+        a0 = a[i];
+        a1 = a[i+1];
+        a2 = a[i+2];
+        a3 = a[i+3];
+        a4 = a[i+4];
+
+        // unroll loop (5 way)
+        p[i] = start + a0;
+        p[i+1] = start + (a0 + a1);
+        p[i+2] = start + ((a0 + a1) + a2);
+        p[i+3] = start + ((a0 + a1) + (a2 + a3));
+        temp = start + ((a0 + a1) + (a2 + a3) + a4);
+        p[i+4] = temp;
+        start = temp;
+    }
+
+    // calculate last elements of p
+    for (; i < n; i++)
+    {
+        temp = start + a[i];
+        p[i] = temp;
+        start = temp;
+    }
+}
+
+The latency limit of my machine does not limit my prefix-sum solution, because my solution is not bound by how long each instruction requires to complete. In the first loop, there is two-way parallelism occuring, in which p[i] and p[i+1] are being computed at the same time due to their independence in my solution. Furthermore, because a[i] and a[i+1] are independent, no matter the current iteration/value of i, associating their summation adds another level of parallel processing. Thus, even though each instruction has a limit on their speed, multiple instructions being executed at the same time decreases the minimum CPE past the latency limit. The throughput limit is the true limit on the minimum CPE I can achieve with my prefix-sum solution, because this limit is based upon how well pipelining truly occurs, or in other words, the raw computing capacity of the processor's functional units which is dependent upon the capacity and issue time).
+
