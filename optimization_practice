@@ -1,0 +1,48 @@
+Alex Chen
+CS 33
+005299047
+Optimization practice
+
+5.7
+
+void combine5(vec_ptr v, data_t* dest)
+{
+	long i;
+	long length = vec_length(v);
+	long limit = length - 4;
+	data_t* data = get_vec_start(v);
+	data_t acc = IDENT;
+
+	for (int i=0; i < limit; i += 5)
+	{
+		acc = acc OP data[i] OP data[i+1]
+				  OP data[i+2] OP data[i+3]
+				  OP data[i+4];
+	}
+
+	for (; i < length; i ++)
+	{
+		acc = acc OP data[i]
+	}
+
+	*dest = acc;
+}
+
+5.12
+
+void psum1(float a[], float p[], long n)
+{
+	long i;
+	p[0] = a[0];
+	long last_val, val;
+	long last_val2, val12;
+	last_val = a[0] = p[0]
+	for (i = 1, i < n; i++)
+	{
+		val = last_val + a[i];
+		p[i] = val;
+		last_val = val;
+	}
+}
+
+By introducing last_val (and val), p[i-1] does not need to be retrieved every iteration.
