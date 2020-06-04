@@ -5,10 +5,11 @@
 #include <unistd.h>
 #include "utils.h"
 
+#include <string.h> // for memcpy
+
 int DIM = 500;
 double work_it_par(long* old, long* new, long* super, long* simple, long* fibonacci);
 double work_it_seq(long *old, long *new, long* super, long* simple, long *fibonacci);
-
 
 long __attribute__ ((noinline)) gimmie_the_func() {
   return 58113.3;
@@ -80,7 +81,17 @@ int main( int argc, const char* argv[] )
   clock_gettime(CLOCK_MONOTONIC, &start);
   result = work_it_seq(original, new, super, simple, fib);
   clock_gettime(CLOCK_MONOTONIC, &finish);
+  
+  long* fibtemp = (long*)malloc(DIM*sizeof(long));
+  fibtemp = (long*)memcpy(fibtemp, fib, DIM*sizeof(long));
+  if (fibtemp == NULL)
+    return 1;
 
+  long* newtemp = (long*)malloc(DIM*DIM*DIM*sizeof(long));
+  newtemp = (long*)memcpy(newtemp, new, DIM*DIM*DIM*sizeof(long));
+  if (newtemp == NULL)
+    return 1;
+  
   seqDelay = (finish.tv_sec - start.tv_sec);
   seqDelay += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 
@@ -114,14 +125,40 @@ int main( int argc, const char* argv[] )
 	 printf("Sequential result:%d, Parallel result:%d\n",result,result0);
 	 }
 
-
   printf("Parallel version took %lf time units\n", parDelay);
 
   printf("This resulted in a %fx speed-up\n", (float)(seqDelay / parDelay));
   printf("Ending the parallelization test\n");
 
-  
+  int flag = 1;
+  for (i=0; i<DIM; i++)
+  {
+    if (fib[i] != fibtemp[i])
+    {
+      flag = 0;
+    }
+  }
+  if (flag == 1)
+    printf("Fibonacci values match!\n");
+  else
+    printf("Fibonacci values DON'T match!\n");
 
+  flag = 1;
+  for (i=0; i<DIM*DIM*DIM; i++)
+  {
+      if (newtemp[i] != new[i])
+      {
+	flag = 0;
+      }
+  }
+  if (flag == 1)
+    printf("new array values match!\n");
+  else
+    printf("new array values DON'T match!\n");
+
+  free(fibtemp);
+  free(newtemp);
+  
   free(original);
   free(new);
   free(super);
@@ -131,7 +168,5 @@ int main( int argc, const char* argv[] )
   free(super0);
   free(simple0);
  
-
   return 0;
-
 }

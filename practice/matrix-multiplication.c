@@ -1,5 +1,9 @@
 // Matrix Multiplication practice
 
+// i,j are rows and columns for matrix A
+// j,k are rows and columns for matrix B
+// i,k are rows and columns for matrix C
+
 // Regular matrix multiplication
 // N x N matrix
 // c = a x b
@@ -84,6 +88,96 @@ void matrixMult2(int* a, int* b, int* c, int N)
 			for (int k=0; k<N; k++)
 			{
 				c[i*N + k] += fixA * b[j*N + k]
+			}
+		}
+	}
+}
+
+void matrixMultPractice(int* a, int* b, int* c, int N)
+{
+	for (int i=0; i<N; i++)
+	{
+		for (int j=0; j<N; j++)
+		{
+			for (int k=0; k<N; k++)
+			{
+				c[i*N + k] = a[i*N + k] * b[k*N + j]
+			}
+		}
+	}
+}
+
+void tiledMatrixMultPrac(int* a, int* b, int* c, int B, int N)
+{
+	for (int i=0; i<N; i+=B)
+	{
+		for (int j=0; j<N; j+=B)
+		{
+			for (int k=0; k<N; k+=B)
+			{
+				for (int i1=i; i1<i+B && i1<N; i1++)
+				{
+					for (int j1=j; j1<j+B && j1<N; j1++)
+					{
+						for (int k1=k; k1<k+B && k1<N; k1++)
+						{
+							c[i1*N + j1] += a[i1*N + k1] * b[k1*N + j1]
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void tiledMatrixMultPrac(int* a, int* b, int* c, int B, int N)
+{
+	for (int i=0; i<N; i+=B)
+	{
+		for (int j=0; j<N; j+=B)
+		{
+			for (int k=0; k<N; k+=B)
+			{
+				for (int i1=i; i1<i+B && i1<N; i1++)
+				{
+					for (int j1=j; j1<j+B && j1<N; j1++)
+					{
+						for (int k1=k; k1<k+B && k1<N; k1++)
+						{
+							c[i1*N + k1] += a[i1*N + k1] * b[k1*N + j1]
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void matrixMultX(int* a, int* b, int* c, int B, int N)
+{
+	for (int k=0; k<N; k++)
+	{
+		for (int i=0; i<N; i++)
+		{
+			int keep = a[i*N + k];
+			for (int j=0; j<N; j++)
+			{
+				c[i*N + j] += keep * b[k*N + j];
+			}
+		}
+	}
+}
+
+void matrixMultConstCol(int* a, int* b, int* c, int B, int N)
+{
+	for (int k=0; k<N; k++)
+	{
+		for (int i=0; i<N; i++)
+		{
+			int keep = a[i*N + k];
+			for (int j=0; j<N; j++)
+			{
+				c[i*N + j] += keep * b[k*N + j];
 			}
 		}
 	}

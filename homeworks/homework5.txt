@@ -1,0 +1,59 @@
+Alex Chen
+005299047
+CS 33
+Homework 5
+
+1) Output of MIPS code: 
+
+"\nThe value of i is: 7"
+
+(Note: actual output has no quotes, and \n would be a newline)
+
+2) Loop ordering and Kronecker product of two matrices
+
+#define SIZE 40
+#define KSIZE SIZE*SIZE
+
+int a[SIZE][SIZE];
+int b[SIZE][SIZE];
+int c[KSIZE][KSIZE];
+
+for (i=0; i<SIZE; i++)
+	for (j=0; j<SIZE; j++)
+		for (x=0; x<SIZE; x++)
+			for (y=0; y<SIZE; y++)
+				c[i*SIZE + x][j*SIZE + y] = a[i][j] * b[x][y];
+
+e - jyix - would be the worst ordering for the loops. Not only are matrices 
+a and b accessed in column-major order, but matrix c is also accessed this way.
+There is no locality in storing values to matrix c. 
+
+^ this is a TLDR for the below;
+
+-------------------------------------------------------------------------------
+
+ijxy would be an okay ordering of the loops. This ordering goes through 
+a and b in row major order, although c's traversal is not great because a new 
+row is written to after each row of SIZE elements is written to. Each row has 
+KSIZE elements, so only completing SIZE elements at one time before going to 
+the next row will take away from spatial locality.
+
+jixy wouldn't be great because iterating through i before j means a's accesses 
+will have less spatial locality. There would be an 100% miss rate for a in 
+that there are column-major accesses. For matrix c, there shouldn't be much 
+of a difference in the ordering of i and j because each iteration through 
+x and y will go through 1600 elements already, which is a large amount. Thus, 
+this solution isn't great either.
+
+xiyj is still not great in that a and b will have row wise accesses, but c's 
+accesses still do not take advantage of spatial locality.
+
+ixjy is pretty good because a and b still go through row wise accesses, but 
+c also goes through row wise accesses now.
+
+jyix would be the worst because not only do a and b go through column wise 
+accesses, but c also goes through column wise accesses. Each row of c is 
+visited before going through each element in the current row of c.
+
+
+

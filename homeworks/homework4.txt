@@ -3,22 +3,84 @@ Alex Chen
 CS 33
 Homework 4
 
-6.45) Transposing an NxN matrix, with tiling
+6.45) 
 
+// Transposing an NxN matrix, with tiling
 void transpose(int* dst, int* src, int dim)
 {
-	int i, j, i1, j1;
-	for (i=0; i<dim; i+=B)
-	{
-		for (j=0; j<dim; j+=B)
-		{
-			for (i1=i; i1<i+B && i1<dim; i1++)
-			{
-				for (j1=j; j1<j+B && j1<dim; j1++)
-				{
-					dst[j1*dim + i1] = src[i1*dim + j1]
-				}
-			}
-		}
-	}
+    int i, j, i1, j1;
+    // initialize Tiling factor
+    int B = dim/20;
+    for (i=0; i<dim; i+=B)
+    {
+        for (j=0; j<dim; j+=B)
+        {
+            for (i1=i; i1<i+B && i1<dim; i1++)
+            {
+                for (j1=j; j1<j+B && j1<dim; j1++)
+                {
+                    dst[j1*dim + i1] = src[i1*dim + j1];
+                }
+            }
+        }
+    }
 }
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+// Transposing an NxN matrix, without tiling (CS APP textbook sol)
+void transpose_original(int* dst, int* src, int dim)
+{
+    int i, j;
+    for (i=0; i<dim; i++)
+    {
+        for (j=0; j<dim; j++)
+        {
+            dst[j*dim + i] = src[i*dim + j];
+        }
+    }
+}
+
+// Sample testing and timing script
+int main() 
+{
+    srand(time(NULL)); // generate seed
+    
+    int dimension = 20000;
+    int* source = (int*)malloc(dimension*dimension*sizeof(int));
+    if (!source) // ensure valid malloc
+        return 1;
+    for (int i=0; i<dimension*dimension; i++)
+        source[i] = rand(); // fill up source with random ints
+
+    int* dest_copy_1 = (int*)malloc(dimension*dimension*sizeof(int));
+    int* dest_copy_2 = (int*)malloc(dimension*dimension*sizeof(int));
+    if (!dest_copy_1 || !dest_copy_2) // ensure valid mallocs
+        return 1;
+    // Timing
+    clock_t start_t = clock();
+    transpose(dest_copy_1, source, dimension);
+    clock_t end_t = clock();
+    float time_taken = (float)(end_t - start_t)/CLOCKS_PER_SEC;
+    printf("Tiled transposition took: %.7f seconds!\n", time_taken);
+    // Timing
+    clock_t start_t_2 = clock();
+    transpose_original(dest_copy_2, source, dimension);
+    clock_t end_t_2 = clock();
+    float time_taken_2 = (float)(end_t_2 - start_t_2)/CLOCKS_PER_SEC;
+    printf("Non-tiled transposition took: %.7f seconds!\n", time_taken_2);
+    
+//    for (int i=0; i<dimension; i++)
+//    {
+//        for (int j=0; j<dimension; j++)
+//        {
+//            printf("%d,", dest[i*dimension + j]);
+//        }
+//        printf("\n");
+//    }
+    
+    return 0;
+}
+
+

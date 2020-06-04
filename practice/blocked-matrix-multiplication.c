@@ -24,38 +24,34 @@ void mmm(double* a, double* b, double* c, int N)
 }
 
 // LA tiling problem
-
 void transpose(int** src, int** dest, int n, int m, int B, int L)
 {
 	for (int i=0; i<n; i+=B)
 	{
 		for (int j=0; j<n; j+=B)
 		{
-			for (int k=0; k<n; k+=B)
+			for (int i1=i; i1<i+B; i1++)
 			{
-				for (int i1=i; i1<i+B; i1++)
+				for (int j1=j; j1<j+B; j1++)
 				{
-					for (int j1=j; j1<j+B; j1++)
+					dest[j1][i1] = src[i1][j1];
+					// int* src_sub = (int*)malloc(m*m*sizeof(int));
+					int* dest_sub = dest[j1][i1];
+					// memcpy(src_sub, dest[j1][i1], m*m*sizeof(int));
+					for (int a=0; a<M; a+=L)
 					{
-						for (int k1=k; k1<k+B; k1++)
+						for (int b=0; b<M; b+=L)
 						{
-							
+							for (int a1=a; a1<a+L && a1<M; a1++)
+							{
+								for (int b1=b; b1<b+L && b1<M; b1++)
+								{
+									dest[b1*M + a1] = dest_sub[a1*M + b1];
+								}
+							}
 						}
+						
 					}
-				}
-			}
-		}
-	}
-
-	for (int i=0; i<n; i+=B)
-	{
-		for (int j=0; j<n; j+=B)
-		{
-			for (int i1=i; i1<n+B && i1<n; i1++)
-			{
-				for (int j1=j; j1<n+B && j1<n; j1++)
-				{
-					dest[j1][i1+j1] = src[i1][j1];
 				}
 			}
 		}
