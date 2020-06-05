@@ -102,5 +102,6 @@ double work_it_seq(long *old, long *new, long* super, long* simple, long *fibona
       }
     }
   }
+
   return (double) (dot_product+moving_average+pi+pi2);
 }

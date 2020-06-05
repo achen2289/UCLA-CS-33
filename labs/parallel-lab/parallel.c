@@ -24,6 +24,8 @@ double work_it_par(long *old, long *new, long *super, long *simple, long *fibona
   int was_smart = 16;
   
   long dot_product2 = 0;
+  //  int num_threads = omp_get_max_threads();
+  //  omp_set_num_threads(num_threads);
   #pragma omp parallel for reduction(+:dot_product,dot_product2) lastprivate(i)
   for (i=0; i<DIM-2; i+=2)
   {
@@ -42,7 +44,7 @@ double work_it_par(long *old, long *new, long *super, long *simple, long *fibona
 
   moving_average = 0;
   long moving_average2 = 0, moving_average3 = 0;
-    for (ton=DIM-2; ton<DIM-1-WINDOW_SIZE-3; ton+=3)
+  for (ton=DIM-2; ton<DIM-1-WINDOW_SIZE-3; ton+=3)
   {
     moving_average += simple[ton];
     moving_average2 += simple[ton+1];
@@ -65,7 +67,7 @@ double work_it_par(long *old, long *new, long *super, long *simple, long *fibona
     fibonacci[i] = (fibonacci[i-1]+fibonacci[i-2]);
     fibonacci[i+1] = (fibonacci[i-1]+fibonacci[i-2])+fibonacci[i-1];
     fibonacci[i+2] = (fibonacci[i-1]+fibonacci[i-2])+(fibonacci[i-1]+	\
-						    fibonacci[i-1])+fibonacci[i-2];
+						          fibonacci[i-1])+fibonacci[i-2];
   }
   for (; i<DIM-1; i++)
   {
@@ -83,7 +85,6 @@ double work_it_par(long *old, long *new, long *super, long *simple, long *fibona
   printf("\n %d trials, Riemann flavored pi is %f \n", NUM_STEPS, pi); 
 
   double r_squared = r*r;
-  //  double x2, y2;
   for(i=0; i<NUM_TRIALS; i++)
   {
     x = (random()%10000000) / 10000000.0; 
@@ -98,28 +99,34 @@ double work_it_par(long *old, long *new, long *super, long *simple, long *fibona
   int dim2 = DIM * DIM;
    
   double div = (double)we_need_the_func() / (double)gimmie_the_func();
-  long temp;
+  long temp, temp1, temp2;
   int o0=0, o1=0, o2=0, o3=0, o4=0, o5=0, o6=0, o7=0, o8=0, o9=0;
   #pragma omp parallel for reduction(+:aggregate,o0,o1,o2,o3,o4,o5,o6,o7,o8,o9)
   for (i=1; i<DIM-1; i++) {
     #pragma omp parallel for reduction(+:aggregate,o0,o1,o2,o3,o4,o5,o6,o7,o8,o9)
     for (j=1; j<DIM-1; j++) {
       int index = i * dim2 + j * DIM;
-      #pragma omp parallel for private(compute_it,u) reduction(+:aggregate,temp,o0,o1,o2,o3,o4,o5,o6,o7,o8,o9)
+      #pragma omp parallel for private(compute_it,temp,temp1,temp2,u) reduction(+:aggregate,o0,o1,o2,o3,o4,o5,o6,o7,o8,o9)
       for (k=1; k<DIM-1; k++) {
-	compute_it = old[index+k] * div;
-	aggregate += compute_it;
+      	compute_it = old[index+k] * div;
+      	aggregate += compute_it;
 	
-        temp = 0;
-        for (u=-1; u<=1; u++) {
-          temp += (old[(i+u)*dim2+(j-1)*DIM+(k-1)] + old[(i+u)*dim2+(j-1)*DIM+k] + old[(i+u)*dim2+(j-1)*DIM+(k+1)]) +
-	          (old[(i+u)*dim2+j*DIM+(k-1)] + old[(i+u)*dim2+j*DIM+k] + old[(i+u)*dim2+j*DIM+(k+1)]) + 
-	          (old[(i+u)*dim2+(j+1)*DIM+(k-1)] + old[(i+u)*dim2+(j+1)*DIM+k] + old[(i+u)*dim2+(j+1)*DIM+(k+1)]);
-	}
+        temp = 0, temp1 = 0, temp2 = 0;
+        temp = (old[(i-1)*dim2+(j-1)*DIM+(k-1)] + old[(i-1)*dim2+(j-1)*DIM+k] + old[(i-1)*dim2+(j-1)*DIM+(k+1)]);
+      	temp += (old[(i-1)*dim2+j*DIM+(k-1)] + old[(i-1)*dim2+j*DIM+k] + old[(i-1)*dim2+j*DIM+(k+1)]);
+      	temp += (old[(i-1)*dim2+(j+1)*DIM+(k-1)] + old[(i-1)*dim2+(j+1)*DIM+k] + old[(i-1)*dim2+(j+1)*DIM+(k+1)]);
+      	temp1 = (old[(i)*dim2+(j-1)*DIM+(k-1)] + old[(i)*dim2+(j-1)*DIM+k] + old[(i)*dim2+(j-1)*DIM+(k+1)]);
+      	temp1 += (old[(i)*dim2+j*DIM+(k-1)] + old[(i)*dim2+j*DIM+k] + old[(i)*dim2+j*DIM+(k+1)]);
+      	temp1 += (old[(i)*dim2+(j+1)*DIM+(k-1)] + old[(i)*dim2+(j+1)*DIM+k] + old[(i)*dim2+(j+1)*DIM+(k+1)]);
+      	temp2 = (old[(i+1)*dim2+(j-1)*DIM+(k-1)] + old[(i+1)*dim2+(j-1)*DIM+k] + old[(i+1)*dim2+(j-1)*DIM+(k+1)]); 
+      	temp2 += (old[(i+1)*dim2+j*DIM+(k-1)] + old[(i+1)*dim2+j*DIM+k] + old[(i+1)*dim2+j*DIM+(k+1)]);
+      	temp2 += (old[(i+1)*dim2+(j+1)*DIM+(k-1)] + old[(i+1)*dim2+(j+1)*DIM+k] + old[(i+1)*dim2+(j+1)*DIM+(k+1)]);
+
+     	  temp += temp1 + temp2;
         temp /= 27;
         new[index+k] = temp;
 
-	u=temp/100;
+        u = temp / 100;
         if (u==0) o0++;
         if (u==1) o1++;
         if (u==2) o2++;
@@ -146,6 +153,6 @@ double work_it_par(long *old, long *new, long *super, long *simple, long *fibona
   histogrammy[7] += o7;
   histogrammy[8] += o8;
   histogrammy[9] += o9;
-  
+
   return (double) (dot_product+moving_average+pi+pi2);
 }
